@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int              @id @default(autoincrement())
+  nom        String
+  prenom     String
+  email      String           @unique
+  motDePasse String
+  doitChangerMotDePasse Boolean @default(true)
+  roles      UserEntreprise[]
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+model Entreprise {
+  id          Int              @id @default(autoincrement())
+  nom         String
+  email       String           @unique
+  telephone   String
+  adresse     String?
+  logo        String?
+  devise      String           @default("XOF")
+  typePeriode TypePeriode
+  users       UserEntreprise[]
+  employes    Employe[]
+  payruns     PayRun[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model UserEntreprise {
+  id           Int  @id @default(autoincrement())
+  userId       Int
+  entrepriseId Int?
+  role         Role
+
+  user       User       @relation(fields: [userId], references: [id])
+  entreprise Entreprise? @relation(fields: [entrepriseId], references: [id])
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  CAISSIER
+}
+
+model Employe {
+  id                   Int           @id @default(autoincrement())
+  entrepriseId         Int
+  nomComplet           String
+  poste                String?
+  typeContrat          TypeContrat
+  salaireFixe          Float?
+  tauxJournalier       Float?
+  honoraire            Float?
+  coordonneesBancaires String?
+  statut               StatutEmploye @default(ACTIF)
+  actif                Boolean       @default(true)
+  entreprise           Entreprise    @relation(fields: [entrepriseId], references: [id])
+  payslips             Payslip[]
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+}
+
+enum StatutEmploye {
+  ACTIF
+  INACTIF
+  VACATAIRE
+}
+
+enum TypePeriode {
+  MENSUEL
+  HEBDO
+  JOURNALIER
+}
+
+enum TypeContrat {
+  JOURNALIER
+  FIXE
+  HONORAIRE
+}
+
+model PayRun {
+  id           Int          @id @default(autoincrement())
+  entrepriseId Int
+  periodeDebut DateTime
+  periodeFin   DateTime
+  statut       StatutPayRun @default(BROUILLON)
+
+  entreprise Entreprise @relation(fields: [entrepriseId], references: [id])
+  payslips   Payslip[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+enum StatutPayRun {
+  BROUILLON
+  APPROUVE
+  CLOTURE
+}
+
+model Payslip {
+  id         Int           @id @default(autoincrement())
+  employeId  Int
+  payrunId   Int
+  brut       Float
+  deductions Float         @default(0)
+  netAPayer  Float
+  statut     StatutPayslip @default(EN_ATTENTE)
+
+  employe   Employe    @relation(fields: [employeId], references: [id])
+  payrun    PayRun     @relation(fields: [payrunId], references: [id])
+  paiements Paiement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum StatutPayslip {
+  EN_ATTENTE
+  PARTIEL
+  PAYE
+}
+
+model Paiement {
+  id           Int          @id @default(autoincrement())
+  payslipId    Int
+  montant      Float
+  mode         ModePaiement
+  datePaiement DateTime     @default(now())
+
+  payslip Payslip @relation(fields: [payslipId], references: [id])
+}
+
+enum ModePaiement {
+  ESPECES
+  VIREMENT
+  ORANGE_MONEY
+  WAVE
+  AUTRE
+}
