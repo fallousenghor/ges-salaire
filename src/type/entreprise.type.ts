@@ -9,6 +9,8 @@ export interface EntrepriseType {
   logo?: string;
   devise: string;
   typePeriode: TypePeriode;
+  couleurPrimaire: string;
+  couleurSecondaire: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +23,8 @@ export interface CreateEntrepriseDto {
   logo?: string | null;
   devise: string;
   typePeriode: TypePeriode;
+  couleurPrimaire?: string;
+  couleurSecondaire?: string;
 }
 
 export interface UpdateEntrepriseDto {
@@ -32,4 +36,6 @@ export interface UpdateEntrepriseDto {
   devise?: string;
   typePeriode?: TypePeriode;
   statut?: string;
+  couleurPrimaire?: string;
+  couleurSecondaire?: string;
 }

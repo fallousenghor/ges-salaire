@@ -19,4 +19,6 @@ export const createEntrepriseSchema = z.object({
     .default("MENSUEL"),
   adresse: z.string().optional().nullable(),
   logo: z.string().optional().nullable(),
+  couleurPrimaire: z.string().regex(/^#[0-9A-Fa-f]{6}$/, { message: "La couleur primaire doit être une valeur hexadécimale valide" }).default("#2563eb"),
+  couleurSecondaire: z.string().regex(/^#[0-9A-Fa-f]{6}$/, { message: "La couleur secondaire doit être une valeur hexadécimale valide" }).default("#1e40af"),
 });

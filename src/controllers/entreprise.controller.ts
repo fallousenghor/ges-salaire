@@ -33,6 +33,8 @@ export class EntrepriseController {
         typePeriode: (req.body.typePeriode || "MENSUEL").toUpperCase() as TypePeriode,
         adresse: req.body.adresse || null,
         logo: req.file ? `/uploads/logos/${req.file.filename}` : null,
+        couleurPrimaire: req.body.couleurPrimaire || "#2563eb",
+        couleurSecondaire: req.body.couleurSecondaire || "#1e40af",
       };
 
       // Si un fichier a été uploadé, ajouter son chemin
@@ -127,7 +129,9 @@ export class EntrepriseController {
         adresse: body.adresse ?? null,
         devise: body.devise,
         typePeriode: body.typePeriode ? (body.typePeriode as string).toUpperCase() as any : undefined,
-        statut: body.statut
+        statut: body.statut,
+        couleurPrimaire: body.couleurPrimaire,
+        couleurSecondaire: body.couleurSecondaire
       };
 
       if (req.file) {

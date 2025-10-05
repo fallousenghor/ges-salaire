@@ -29,6 +29,8 @@ model Entreprise {
   devise           String           @default("XOF")
   typePeriode      TypePeriode
   statut           String           @default("active")
+  couleurPrimaire   String           @default("#e1e3e9ff")
+  couleurSecondaire String           @default("#44454bff")
   users            UserEntreprise[]
   employes         Employe[]
   payruns          PayRun[]
