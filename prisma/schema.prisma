@@ -20,19 +20,20 @@ model User {
 }
 
 model Entreprise {
-  id          Int              @id @default(autoincrement())
-  nom         String
-  email       String           @unique
-  telephone   String
-  adresse     String?
-  logo        String?
-  devise      String           @default("XOF")
-  typePeriode TypePeriode
-  users       UserEntreprise[]
-  employes    Employe[]
-  payruns     PayRun[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id                Int              @id @default(autoincrement())
+  nom               String
+  email             String           @unique
+  telephone         String
+  adresse          String?
+  logo             String?
+  devise           String           @default("XOF")
+  typePeriode      TypePeriode
+  statut           String           @default("active")
+  users            UserEntreprise[]
+  employes         Employe[]
+  payruns          PayRun[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }
 
 model UserEntreprise {
@@ -55,6 +56,7 @@ model Employe {
   id                   Int           @id @default(autoincrement())
   entrepriseId         Int
   nomComplet           String
+  matricule            String?       @unique
   poste                String?
   typeContrat          TypeContrat
   salaireFixe          Float?
@@ -65,8 +67,28 @@ model Employe {
   actif                Boolean       @default(true)
   entreprise           Entreprise    @relation(fields: [entrepriseId], references: [id])
   payslips             Payslip[]
+  pointages            Pointage[]
+   badge                Badge?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
+}
+
+model Pointage {
+  id         Int      @id @default(autoincrement())
+  employeId  Int
+  date       DateTime @default(now())
+  employe    Employe  @relation(fields: [employeId], references: [id])
+}
+
+model Badge {
+  id         Int      @id @default(autoincrement())
+  employeId  Int      @unique
+  matricule  String
+  qrCode     String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  employe    Employe  @relation(fields: [employeId], references: [id])
 }
 
 enum StatutEmploye {
@@ -114,6 +136,7 @@ model Payslip {
   deductions Float         @default(0)
   netAPayer  Float
   statut     StatutPayslip @default(EN_ATTENTE)
+  approuveAdmin Boolean @default(false)
 
   employe   Employe    @relation(fields: [employeId], references: [id])
   payrun    PayRun     @relation(fields: [payrunId], references: [id])
@@ -135,8 +158,15 @@ model Paiement {
   montant      Float
   mode         ModePaiement
   datePaiement DateTime     @default(now())
+  statut       StatutPaiement @default(EN_ATTENTE)
 
   payslip Payslip @relation(fields: [payslipId], references: [id])
+}
+
+enum StatutPaiement {
+  EN_ATTENTE
+  PARTIEL
+  PAYE
 }
 
 enum ModePaiement {
@@ -146,3 +176,4 @@ enum ModePaiement {
   WAVE
   AUTRE
 }
+

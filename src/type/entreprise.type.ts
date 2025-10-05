@@ -17,9 +17,9 @@ export interface CreateEntrepriseDto {
   nom: string;
   email: string;
   telephone: string;
-  adresse?: string;
-  logo?: string;
-  devise?: string;
+  adresse?: string | null;
+  logo?: string | null;
+  devise: string;
   typePeriode: TypePeriode;
 }
 
@@ -27,8 +27,9 @@ export interface UpdateEntrepriseDto {
   nom?: string;
   email?: string;
   telephone?: string;
-  adresse?: string;
-  logo?: string;
+  adresse?: string | null;
+  logo?: string | null;
   devise?: string;
   typePeriode?: TypePeriode;
+  statut?: string;
 }

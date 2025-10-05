@@ -55,13 +55,20 @@ export class AuthController {
         if (user.roles.some((r: any) => r.role === 'SUPER_ADMIN')) {
           mainRole = 'SUPER_ADMIN';
         } else if (user.roles.length > 0) {
-          // Prend le premier rôle ADMIN ou CAISSIER lié à une entreprise
-          const adminOrCaissierRole = user.roles.find((r: any) => (r.role === 'ADMIN' || r.role === 'CAISSIER') && r.entrepriseId);
-          if (adminOrCaissierRole) {
-            mainRole = adminOrCaissierRole.role;
-            entrepriseId = adminOrCaissierRole.entrepriseId;
+          // Correction : si le user a un rôle CAISSIER, on le force
+          const caissierRole = user.roles.find((r: any) => r.role === 'CAISSIER' && r.entrepriseId);
+          if (caissierRole) {
+            mainRole = 'CAISSIER';
+            entrepriseId = caissierRole.entrepriseId;
           } else {
-            mainRole = user.roles[0].role;
+            // Sinon, on prend le premier rôle ADMIN lié à une entreprise
+            const adminRole = user.roles.find((r: any) => r.role === 'ADMIN' && r.entrepriseId);
+            if (adminRole) {
+              mainRole = 'ADMIN';
+              entrepriseId = adminRole.entrepriseId;
+            } else {
+              mainRole = user.roles[0].role;
+            }
           }
         }
       }

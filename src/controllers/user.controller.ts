@@ -41,7 +41,8 @@ export class UserController {
         motDePasse: hashedPassword,
         nom,
         prenom,
-        roles: req.body.roles, 
+        roles: req.body.roles,
+        doitChangerMotDePasse: req.body.doitChangerMotDePasse ?? false,
       });
 
       

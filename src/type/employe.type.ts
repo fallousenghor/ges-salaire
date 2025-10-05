@@ -22,6 +22,7 @@ export interface EmployeType {
 export interface CreateEmployeDto {
   entrepriseId: number;
   nomComplet: string;
+  matricule?: string;
   poste?: string;
   typeContrat: TypeContrat;
   salaireFixe?: number;
@@ -34,6 +35,7 @@ export interface CreateEmployeDto {
 
 export interface UpdateEmployeDto {
   nomComplet?: string;
+  matricule?: string;
   poste?: string;
   typeContrat?: TypeContrat;
   salaireFixe?: number;

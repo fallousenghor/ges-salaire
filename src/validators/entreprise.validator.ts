@@ -12,8 +12,11 @@ export const createEntrepriseSchema = z.object({
     .min(8, { message: validationMessages.ENTRPRISE_TELEPHONE_REQUIS }),
   devise: z
     .string()
-    .min(1, { message: validationMessages.ENTRPRISE_DEVISE_REQUIS }),
-  typePeriode: z.enum(['MENSUEL', 'HEBDO', 'JOURNALIER']),
-  adresse: z.string().optional(),
-  logo: z.string().optional(),
+    .min(1, { message: validationMessages.ENTRPRISE_DEVISE_REQUIS })
+    .default("XOF"),
+  typePeriode: z
+    .enum(['MENSUEL', 'HEBDO', 'JOURNALIER'])
+    .default("MENSUEL"),
+  adresse: z.string().optional().nullable(),
+  logo: z.string().optional().nullable(),
 });

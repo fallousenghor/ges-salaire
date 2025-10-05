@@ -12,10 +12,17 @@ declare module 'express-serve-static-core' {
 
 export function authenticateJWT(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  let token = null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query.token) {
+    token = req.query.token as string;
+  } else if (req.body && req.body.token) {
+    token = req.body.token;
+  }
+  if (!token) {
     return res.status(401).json({ success: false, message: ERROR_MESSAGES.TOKEN_MISSING });
   }
-  const token = authHeader.split(' ')[1];
   try {
     const secret = process.env.JWT_SECRET || 'votre_secret';
     const decoded = jwt.verify(token, secret);

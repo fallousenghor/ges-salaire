@@ -13,6 +13,7 @@ export interface PayslipType {
   statut: StatutPayslip;
   paiements: PaiementType[];
   verrouille: boolean;
+  approuveAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +26,7 @@ export interface CreatePayslipDto {
   netAPayer: number;
   statut?: StatutPayslip;
   verrouille?: boolean;
+  approuveAdmin?: boolean;
 }
 
 export interface UpdatePayslipDto {
@@ -33,4 +35,5 @@ export interface UpdatePayslipDto {
   netAPayer?: number;
   statut?: StatutPayslip;
   verrouille?: boolean;
+  approuveAdmin?: boolean;
 }

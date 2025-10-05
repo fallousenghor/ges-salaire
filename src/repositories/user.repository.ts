@@ -11,6 +11,12 @@ export class UserRepository {
       for (const r of roles) {
         if (r.role === 'SUPER_ADMIN') {
           userEntrepriseToCreate.push({ role: 'SUPER_ADMIN' });
+        } else if (r.role === 'CAISSIER') {
+          // Si caissier, entrepriseId obligatoire
+          if (!r.entrepriseId) {
+            throw new Error('Le caissier doit être lié à une entreprise (entrepriseId obligatoire)');
+          }
+          userEntrepriseToCreate.push({ entrepriseId: r.entrepriseId, role: r.role });
         } else if (r.entrepriseId) {
           userEntrepriseToCreate.push({ entrepriseId: r.entrepriseId, role: r.role });
         }

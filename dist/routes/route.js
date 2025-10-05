@@ -1,0 +1,30 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const user_route_1 = __importDefault(require("./user.route"));
+const entreprise_route_1 = __importDefault(require("./entreprise.route"));
+const userEntreprise_route_1 = __importDefault(require("./userEntreprise.route"));
+const employe_route_1 = __importDefault(require("./employe.route"));
+const payrun_route_1 = __importDefault(require("./payrun.route"));
+const payslip_route_1 = __importDefault(require("./payslip.route"));
+const payslip_controller_1 = require("../controllers/payslip.controller");
+const authenticateJWT_middleware_1 = require("../middleware/authenticateJWT.middleware");
+const authorizeRole_middleware_1 = require("../middleware/authorizeRole.middleware");
+const paiement_route_1 = __importDefault(require("./paiement.route"));
+const dashboard_route_1 = __importDefault(require("./dashboard.route"));
+exports.router = (0, express_1.Router)();
+exports.router.use('/auth', user_route_1.default);
+exports.router.use('/entreprise', entreprise_route_1.default);
+exports.router.use('/user-entreprise', userEntreprise_route_1.default);
+exports.router.use('/employe', employe_route_1.default);
+exports.router.use('/payrun', payrun_route_1.default);
+exports.router.use('/payslip', payslip_route_1.default);
+// Route directe pour /payslips
+exports.router.get('/payslips', authenticateJWT_middleware_1.authenticateJWT, (0, authorizeRole_middleware_1.authorizeRole)(['ADMIN']), payslip_controller_1.PayslipController.getAllPayslips);
+exports.router.use('/paiement', paiement_route_1.default);
+exports.router.use('/dashboard', dashboard_route_1.default);
+exports.default = exports.router;

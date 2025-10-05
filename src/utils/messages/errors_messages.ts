@@ -18,6 +18,7 @@ export enum ERROR_MESSAGES {
 	ERROR_SURVENUE = "Une erreur est survenue.",
 	EMPLOYE_NOT_FOUND = "Employé non trouvé",
 	PAYRUN_NOT_FOUND = 'PayRun non trouvé',
+	ACCES_INTERDIT = "Vous n'avez pas accès à cette ressource.",
 	PAYSLIP_NOT_FOUND = "Fiche de paie non trouvée",
 	PAYSLIP_ALREADY_EXISTS = "Une fiche de paie pour cette période existe déjà pour cet employé.",
 	PAIMENT_NOT_FOUND = "paiment non trouve"
