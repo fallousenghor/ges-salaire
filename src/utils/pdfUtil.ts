@@ -168,7 +168,7 @@ export function generatePayslipPDF(res: Response, payslip: any, employe: any, en
      .font('Helvetica-Bold')
      .fontSize(13)
      .fillColor(entreprise.couleurPrimaire || '#2563eb')
-     .text('DÉTAIL DU SALAIRE')
+     .text('DÉTAIL DE LA RÉMUNÉRATION')
      .moveDown(0.5);
 
   // En-têtes du tableau
@@ -196,13 +196,30 @@ export function generatePayslipPDF(res: Response, payslip: any, employe: any, en
      .text(formatMontant(payslip.brut), 300, startY + 40, { width: 100, align: 'right' })
      .text(formatMontant(payslip.brut), 420, startY + 40, { width: 100, align: 'right' });
 
+  // Section des déductions avec détails
   if (payslip.deductions) {
-    doc.text('Déductions', 60, startY + 60)
-       .text(formatMontant(payslip.deductions), 420, startY + 60, { width: 100, align: 'right' });
+    // Titre de la section déductions
+    doc.font('Helvetica-Bold')
+       .text('Déductions :', 60, startY + 60);
+
+    // Impôt sur le revenu (18%)
+    doc.font('Helvetica')
+       .text('Impôt sur le revenu (18%)', 80, startY + 80)
+       .text(formatMontant(payslip.impotRevenu), 420, startY + 80, { width: 100, align: 'right' });
+
+    // Cotisation sociale (5% ou 2%)
+    const tauxCotisation = payslip.brut > 250000 ? '5%' : '2%';
+    doc.text(`Cotisation sociale (${tauxCotisation})`, 80, startY + 100)
+       .text(formatMontant(payslip.cotisationSociale), 420, startY + 100, { width: 100, align: 'right' });
+
+    // Total des déductions
+    doc.font('Helvetica-Bold')
+       .text('Total des déductions', 60, startY + 120)
+       .text(formatMontant(payslip.deductions), 420, startY + 120, { width: 100, align: 'right' });
   }
 
   // Ligne de total
-  const totalY = startY + (payslip.deductions ? 90 : 70);
+  const totalY = startY + (payslip.deductions ? 150 : 70);
   doc.lineWidth(1)
      .strokeColor('#000')
      .moveTo(50, totalY)
@@ -227,5 +244,5 @@ export function generatePayslipPDF(res: Response, payslip: any, employe: any, en
 
 // Fonction utilitaire pour formater les montants
 function formatMontant(montant: number): string {
-  return new Intl.NumberFormat('fr-FR').format(montant);
+  return montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }

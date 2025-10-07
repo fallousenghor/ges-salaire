@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const avanceSalaire_controller_1 = require("../controllers/avanceSalaire.controller");
+const authenticateJWT_middleware_1 = require("../middleware/authenticateJWT.middleware");
+const authorizeRole_middleware_1 = require("../middleware/authorizeRole.middleware");
+const checkEntrepriseAccess_middleware_1 = require("../middleware/checkEntrepriseAccess.middleware");
+const router = (0, express_1.Router)();
+router.post('/', authenticateJWT_middleware_1.authenticateJWT, (0, authorizeRole_middleware_1.authorizeRole)(['ADMIN', 'CAISSIER']), avanceSalaire_controller_1.createAvanceSalaire);
+router.get('/entreprise/:entrepriseId', authenticateJWT_middleware_1.authenticateJWT, checkEntrepriseAccess_middleware_1.checkEntrepriseAccess, avanceSalaire_controller_1.getAvanceSalaires);
+router.put('/:id/approuver', authenticateJWT_middleware_1.authenticateJWT, (0, authorizeRole_middleware_1.authorizeRole)(['ADMIN']), avanceSalaire_controller_1.approuverAvanceSalaire);
+router.put('/:id/refuser', authenticateJWT_middleware_1.authenticateJWT, (0, authorizeRole_middleware_1.authorizeRole)(['ADMIN']), avanceSalaire_controller_1.refuserAvanceSalaire);
+router.put('/:id/payer', authenticateJWT_middleware_1.authenticateJWT, (0, authorizeRole_middleware_1.authorizeRole)(['ADMIN', 'CAISSIER']), avanceSalaire_controller_1.marquerCommePaye);
+exports.default = router;

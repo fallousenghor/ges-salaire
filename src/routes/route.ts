@@ -19,6 +19,8 @@ export const router = Router();
 
 router.use('/auth', authRoutes);
 
+router.use('/user', userRoutes);
+
 router.use('/entreprise', entrepriseRoutes);
 
 router.use('/user-entreprise', userEntrepriseRoutes);

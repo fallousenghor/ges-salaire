@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_routes_1 = __importDefault(require("./auth.routes"));
+const employe_routes_1 = __importDefault(require("./employe.routes"));
+const entreprise_routes_1 = __importDefault(require("./entreprise.routes"));
+const payrun_routes_1 = __importDefault(require("./payrun.routes"));
+const payslip_routes_1 = __importDefault(require("./payslip.routes"));
+const paiement_routes_1 = __importDefault(require("./paiement.routes"));
+const avanceSalaire_routes_1 = __importDefault(require("./avanceSalaire.routes"));
+const router = (0, express_1.Router)();
+router.use('/auth', auth_routes_1.default);
+router.use('/employes', employe_routes_1.default);
+router.use('/entreprises', entreprise_routes_1.default);
+router.use('/payruns', payrun_routes_1.default);
+router.use('/payslips', payslip_routes_1.default);
+router.use('/paiements', paiement_routes_1.default);
+router.use('/avances-salaire', avanceSalaire_routes_1.default);
+exports.default = router;

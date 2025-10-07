@@ -57,14 +57,26 @@ export class PayRunService {
       }
       
       if (employe.typeContrat === 'HONORAIRE') brut = honoraire;
-      // Deductions et net à payer à adapter selon la logique métier
-      const deductions = 0;
+      
+      // Calcul des déductions
+      // 1. Impôt sur le revenu (18%)
+      const impotRevenu = brut * 0.18;
+      
+      // 2. Cotisations sociales (5% si salaire > 250000, 2% sinon)
+      const cotisationSociale = brut > 250000 ? brut * 0.05 : brut * 0.02;
+      
+      // Total des déductions
+      const deductions = impotRevenu + cotisationSociale;
+      
+      // Calcul du net à payer
       const netAPayer = brut - deductions;
       await payslipService.createPayslip({
         employeId: employe.id,
         payrunId: payRun.id,
         brut,
         deductions,
+        impotRevenu,
+        cotisationSociale,
         netAPayer,
         statut: 'EN_ATTENTE',
       });

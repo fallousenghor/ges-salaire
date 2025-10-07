@@ -146,14 +146,16 @@ enum StatutPayRun {
 }
 
 model Payslip {
-  id         Int           @id @default(autoincrement())
-  employeId  Int
-  payrunId   Int
-  brut       Float
-  deductions Float         @default(0)
-  netAPayer  Float
-  statut     StatutPayslip @default(EN_ATTENTE)
-  approuveAdmin Boolean @default(false)
+  id                Int           @id @default(autoincrement())
+  employeId         Int
+  payrunId         Int
+  brut             Float
+  deductions       Float         @default(0)
+  impotRevenu      Float         @default(0)
+  cotisationSociale Float        @default(0)
+  netAPayer        Float
+  statut           StatutPayslip @default(EN_ATTENTE)
+  approuveAdmin    Boolean       @default(false)
 
   employe   Employe    @relation(fields: [employeId], references: [id])
   payrun    PayRun     @relation(fields: [payrunId], references: [id])

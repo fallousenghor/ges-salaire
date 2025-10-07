@@ -9,6 +9,8 @@ export interface PayslipType {
   payrun: PayRunType;
   brut: number;
   deductions: number;
+  impotRevenu: number;
+  cotisationSociale: number;
   netAPayer: number;
   statut: StatutPayslip;
   paiements: PaiementType[];
@@ -23,6 +25,8 @@ export interface CreatePayslipDto {
   payrunId: number;
   brut: number;
   deductions?: number;
+  impotRevenu?: number;
+  cotisationSociale?: number;
   netAPayer: number;
   statut?: StatutPayslip;
   verrouille?: boolean;
@@ -32,6 +36,8 @@ export interface CreatePayslipDto {
 export interface UpdatePayslipDto {
   brut?: number;
   deductions?: number;
+  impotRevenu?: number;
+  cotisationSociale?: number;
   netAPayer?: number;
   statut?: StatutPayslip;
   verrouille?: boolean;
