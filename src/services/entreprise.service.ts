@@ -1,5 +1,6 @@
 import { EntrepriseRepository } from '../repositories/entreprise.repository';
 import { CreateEntrepriseDto, UpdateEntrepriseDto } from '../type/entreprise.type';
+import { PaginationParams } from '../type/pagination.types';
 
 export class EntrepriseService {
   private entrepriseRepository: EntrepriseRepository;
@@ -16,8 +17,8 @@ export class EntrepriseService {
     return this.entrepriseRepository.findById(id);
   }
 
-  async getAllEntreprises() {
-    return this.entrepriseRepository.findAll();
+  async getAllEntreprises(pagination?: PaginationParams) {
+    return this.entrepriseRepository.findAll(pagination);
   }
 
   async updateEntreprise(id: number, data: UpdateEntrepriseDto) {

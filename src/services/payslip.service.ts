@@ -1,8 +1,46 @@
 
 import prisma from "../config/db";
 import { CreatePayslipDto, UpdatePayslipDto } from "../type/payslip.types";
+import { PaginationParams } from "../type/pagination.types";
+import { paginateResults } from "../utils/pagination.utils";
 
 export class PayslipService {
+
+  async getAllPayslipsPaginated(entrepriseId: number | undefined, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const where = entrepriseId ? {
+      employe: {
+        entrepriseId
+      }
+    } : undefined;
+
+    const [items, total] = await Promise.all([
+      prisma.payslip.findMany({
+        where,
+        include: {
+          employe: true,
+          payrun: true
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        skip,
+        take: limit
+      }),
+      prisma.payslip.count({ where })
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    const hasMore = page < totalPages;
+
+    return {
+      items,
+      total,
+      page,
+      totalPages,
+      hasMore
+    };
+  }
 
   async getAllPayslips(entrepriseId?: number) {
     return prisma.payslip.findMany({
@@ -52,11 +90,20 @@ export class PayslipService {
     return prisma.payslip.findMany({ where: { employeId } });
   }
 
-  async getPayslipsByPayrun(payrunId: number) {
-    return prisma.payslip.findMany({
-      where: { payrunId },
-      include: { employe: true }
+  async getPayslipsByPayrun(payrunId: number, pagination?: PaginationParams) {
+    const total = await prisma.payslip.count({
+      where: { payrunId }
     });
+
+    const items = await prisma.payslip.findMany({
+      where: { payrunId },
+      include: { employe: true },
+      skip: pagination?.page ? (pagination.page - 1) * (pagination.limit || 10) : undefined,
+      take: pagination?.limit,
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return pagination ? paginateResults(items, total, pagination) : items;
   }
 
   async getPayslipById(id: number) {

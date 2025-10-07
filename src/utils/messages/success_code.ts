@@ -3,5 +3,6 @@ export enum SUCCESS_CODES {
     UPDATED = 202,
     DELETED = 203,
     OK_CODE = 200,
-    NO_CONTENT = 204
+    NO_CONTENT = 204,
+    TOKEN_VALIDE = 200
 }

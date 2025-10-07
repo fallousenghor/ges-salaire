@@ -1,6 +1,8 @@
 import prisma from '../config/db';
 import { Payslip } from '@prisma/client';
 import { CreatePayslipDto, UpdatePayslipDto } from '../type/payslip.types';
+import { PaginationParams } from '../type/pagination.types';
+import { paginateResults } from '../utils/pagination.utils';
 
 export class PayslipRepository {
   async create(data: CreatePayslipDto) {
@@ -11,8 +13,13 @@ export class PayslipRepository {
     return prisma.payslip.findUnique({ where: { id } });
   }
 
-  async findAll() {
-    return prisma.payslip.findMany();
+  async findAll(pagination?: PaginationParams) {
+    const total = await prisma.payslip.count();
+    const items = await prisma.payslip.findMany({
+      skip: pagination?.page ? (pagination.page - 1) * (pagination.limit || 10) : undefined,
+      take: pagination?.limit,
+    });
+    return pagination ? paginateResults(items, total, pagination) : items;
   }
 
   async update(id: number, data: UpdatePayslipDto) {

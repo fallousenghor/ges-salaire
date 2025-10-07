@@ -16,6 +16,93 @@ export class AuthController {
     this.userRepository = userRepository || new UserRepository();
   }
 
+  public verifyToken = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      // L'utilisateur est déjà vérifié par le middleware authenticateJWT
+      if (!req.user) {
+        return res.status(401).json({ 
+          success: false, 
+          message: ERROR_MESSAGES.INVALID_TOKEN 
+        });
+      }
+
+      const user = await this.userRepository.findById(req.user.id);
+      if (!user) {
+        return res.status(401).json({ 
+          success: false, 
+          message: ERROR_MESSAGES.USER_NOT_FOUND 
+        });
+      }
+
+      return res.json({
+        success: true,
+        code: SUCCESS_CODES.TOKEN_VALIDE,
+        message: SUCCESS_MESSAGES.TOKEN_VALIDE,
+        user
+      });
+    } catch (error) {
+      return res.status(500).json({ 
+        success: false, 
+        message: ERROR_MESSAGES.ERROR_SERVER 
+      });
+    }
+  };
+
+  public switchToAdmin = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const entrepriseId = parseInt(req.params.entrepriseId);
+      const userId = req.user?.id;
+
+      // Vérifier que l'utilisateur est un super admin
+      if (req.user?.role !== 'SUPER_ADMIN') {
+        return res.status(403).json({ success: false, message: ERROR_MESSAGES.ACCES_INTERDIT });
+      }
+
+      // Vérifier que le super admin a accès à cette entreprise
+      const access = await this.userRepository.findSuperAdminAccess({
+        where: {
+          entrepriseId,
+          superAdmin: {
+            userId: userId
+          },
+          hasAccess: true
+        }
+      });
+
+      if (!access) {
+        return res.status(403).json({ success: false, message: ERROR_MESSAGES.ACCES_INTERDIT });
+      }
+
+      // Créer un nouveau token avec le rôle ADMIN et l'ID de l'entreprise
+      const secret = process.env.JWT_SECRET || 'votre_secret';
+      const token = jwt.sign(
+        { 
+          id: req.user.id,
+          email: req.user.email,
+          role: 'ADMIN',
+          entrepriseId 
+        },
+        secret,
+        { expiresIn: '24h' }
+      );
+
+      // Renvoyer le nouveau token avec les informations utilisateur mises à jour
+      return res.json({
+        success: true,
+        token,
+        user: {
+          id: req.user.id,
+          email: req.user.email,
+          role: 'ADMIN',
+          entrepriseId
+        }
+      });
+    } catch (error) {
+      console.error('Erreur lors du switch en admin:', error);
+      return res.status(500).json({ success: false, message: ERROR_MESSAGES.ERROR_SERVER });
+    }
+  };
+
   public login = async (req: Request, res: Response): Promise<Response> => {
     try {
       const validation = loginSchema.safeParse(req.body);

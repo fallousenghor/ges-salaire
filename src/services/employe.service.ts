@@ -1,14 +1,21 @@
 import prisma from '../config/db';
 import { CreateEmployeDto, UpdateEmployeDto } from '../type/employe.type';
+import { PaginationParams } from '../type/pagination.types';
+import { paginateResults } from '../utils/pagination.utils';
 
 export class EmployeService {
-  async getEmployesByEntreprisePaginated(entrepriseId: number, page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [employes, total] = await Promise.all([
-      prisma.employe.findMany({ where: { entrepriseId }, skip, take: limit, include: { entreprise: true, badge: true } }),
+  async getEmployesByEntreprisePaginated(entrepriseId: number, pagination: PaginationParams) {
+    const skip = (pagination.page ? (pagination.page - 1) * (pagination.limit || 10) : 0);
+    const [items, total] = await Promise.all([
+      prisma.employe.findMany({
+        where: { entrepriseId },
+        skip,
+        take: pagination.limit,
+        include: { entreprise: true, badge: true }
+      }),
       prisma.employe.count({ where: { entrepriseId } })
     ]);
-    return { employes, total, page, limit };
+    return paginateResults(items, total, pagination);
   }
   async createEmploye(data: CreateEmployeDto) {
     try {

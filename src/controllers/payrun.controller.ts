@@ -3,6 +3,7 @@ import { PayRunService } from '../services/payrun.service';
 import { ERROR_MESSAGES } from '../utils/messages/errors_messages';
 import { SUCCESS_CODES } from '../utils/messages/success_code';
 import { ERROR_CODES } from '../utils/messages/errors_code';
+import { getPaginationParams } from '../utils/pagination.utils';
 
 const payRunService = new PayRunService();
 
@@ -12,7 +13,8 @@ export class PayRunController {
       // Si c'est un superadmin, retourner tous les cycles
       // Sinon, filtrer par l'entreprise de l'utilisateur
       const entrepriseId = req.user?.role === 'SUPER_ADMIN' ? undefined : req.user?.entrepriseId;
-      const payRuns = await payRunService.getAllPayRuns(entrepriseId);
+      const pagination = getPaginationParams(req.query);
+      const payRuns = await payRunService.getAllPayRuns(entrepriseId, pagination);
       res.json(payRuns);
     } catch (error) {
       const message = error instanceof Error ? error.message : ERROR_MESSAGES.ERROR_SURVENUE;

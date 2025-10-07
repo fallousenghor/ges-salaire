@@ -8,6 +8,7 @@ import { EmployeService } from '../services/employe.service';
 import { ERROR_MESSAGES } from '../utils/messages/errors_messages';
 import { ERROR_CODES } from '../utils/messages/errors_code';
 import { SUCCESS_CODES } from '../utils/messages/success_code';
+import { getPaginationParams } from '../utils/pagination.utils';
 
 const employeService = new EmployeService();
 
@@ -53,9 +54,8 @@ export class EmployeController {
   static async getEmployesByEntreprisePaginated(req: Request, res: Response) {
     try {
       const { entrepriseId } = req.params;
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const result = await employeService.getEmployesByEntreprisePaginated(Number(entrepriseId), page, limit);
+      const pagination = getPaginationParams(req.query);
+      const result = await employeService.getEmployesByEntreprisePaginated(Number(entrepriseId), pagination);
       res.json(result);
     } catch (error) {
       const message = error instanceof Error ? error.message : ERROR_MESSAGES.ERROR_SURVENUE;

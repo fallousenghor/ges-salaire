@@ -3,13 +3,21 @@
 import prisma from "../config/db";
 import { CreatePayRunDto, UpdatePayRunDto } from "../type/payrun.types";
 import { PayslipService } from "./payslip.service";
+import { PaginationParams } from "../type/pagination.types";
+import { paginateResults } from "../utils/pagination.utils";
 
 export class PayRunService {
-  async getAllPayRuns(entrepriseId?: number) {
-    return prisma.payRun.findMany({
-      where: entrepriseId ? { entrepriseId } : undefined,
-      orderBy: { createdAt: 'desc' }
+  async getAllPayRuns(entrepriseId?: number, pagination?: PaginationParams) {
+    const where = entrepriseId ? { entrepriseId } : undefined;
+    const total = await prisma.payRun.count({ where });
+    const items = await prisma.payRun.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: pagination?.page ? (pagination.page - 1) * (pagination.limit || 10) : undefined,
+      take: pagination?.limit,
     });
+    
+    return pagination ? paginateResults(items, total, pagination) : items;
   }
 
   async updatePayRunStatus(id: number, statut: string) {
@@ -33,7 +41,21 @@ export class PayRunService {
       const tauxJournalier = employe.tauxJournalier || 0;
       const honoraire = employe.honoraire || 0;
       let brut = salaireFixe;
-      if (employe.typeContrat === 'JOURNALIER') brut = tauxJournalier;
+      
+      if (employe.typeContrat === 'JOURNALIER') {
+        // Calculer le nombre de jours pointés dans le cycle
+        const nbJoursTravailles = await prisma.pointage.count({
+          where: {
+            employeId: employe.id,
+            date: {
+              gte: new Date(rest.periodeDebut),
+              lte: new Date(rest.periodeFin)
+            }
+          }
+        });
+        brut = tauxJournalier * nbJoursTravailles;
+      }
+      
       if (employe.typeContrat === 'HONORAIRE') brut = honoraire;
       // Deductions et net à payer à adapter selon la logique métier
       const deductions = 0;

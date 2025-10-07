@@ -4,6 +4,7 @@ import { SUCCESS_CODES } from '../utils/messages/success_code';
 import { ERROR_CODES } from '../utils/messages/errors_code';
 import { ERROR_MESSAGES } from '../utils/messages/errors_messages';
 import { generatePayslipPDF } from '../utils/pdfUtil';
+import { getPaginationParams } from '../utils/pagination.utils';
 
 const payslipService = new PayslipService();
 
@@ -48,6 +49,7 @@ export class PayslipController {
   static async getPayslipsByPayrun(req: Request, res: Response) {
     try {
       const { payrunId } = req.params;
+      const pagination = getPaginationParams(req.query);
       if (!payrunId) return res.status(ERROR_CODES.BAD_REQUEST).json({ error: 'payrunId requis' });
       const payslips = await payslipService.getPayslipsByPayrun(Number(payrunId));
       res.json(payslips);
@@ -75,11 +77,14 @@ export class PayslipController {
 
   static async getAllPayslips(req: Request, res: Response) {
     try {
-      // Si c'est un superadmin, retourner tous les bulletins
-      // Sinon, filtrer par l'entreprise de l'utilisateur
       const entrepriseId = req.user?.role === 'SUPER_ADMIN' ? undefined : req.user?.entrepriseId;
-      const payslips = await payslipService.getAllPayslips(entrepriseId);
-      res.json(payslips);
+      const { page = 1, limit = 10 } = req.query;
+      const result = await payslipService.getAllPayslipsPaginated(
+        entrepriseId,
+        Number(page),
+        Number(limit)
+      );
+      res.json(result);
     } catch (error) {
       const message = error instanceof Error ? error.message : ERROR_MESSAGES.ERROR_SURVENUE;
       res.status(ERROR_CODES.BAD_REQUEST).json({ error: message });

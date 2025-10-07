@@ -8,7 +8,7 @@ async function createSuperAdmin() {
     // Données du super admin à créer
     const adminData = {
       email: 'super@admin.com',
-      motDePasse: 'Admin@123',
+      motDePasse: 'gallas',
       nom: 'Super',
       prenom: 'Admin',
     };

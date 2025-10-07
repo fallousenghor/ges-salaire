@@ -9,6 +9,7 @@ import { ERROR_CODES } from '../utils/messages/errors_code';
 import { UserRepository } from '../repositories/user.repository';
 import { sendMail } from '../utils/sendMail';
 import bcrypt from 'bcryptjs';
+import { getPaginationParams } from '../utils/pagination.utils';
 
 export class EntrepriseController {
   private entrepriseService: EntrepriseService;
@@ -89,9 +90,10 @@ export class EntrepriseController {
     }
   };
 
-  public getAllEntreprises = async (_req: Request, res: Response) => {
+  public getAllEntreprises = async (req: Request, res: Response) => {
     try {
-      const entreprises = await this.entrepriseService.getAllEntreprises();
+      const pagination = getPaginationParams(req.query);
+      const entreprises = await this.entrepriseService.getAllEntreprises(pagination);
       res.status(200).json({ success: true, data: entreprises });
     } catch (error) {
       res.status(500).json({ success: false, message: ERROR_MESSAGES.ERROR_RECUPERATION_ENTREPRISE, error });

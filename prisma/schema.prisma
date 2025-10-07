@@ -34,6 +34,7 @@ model Entreprise {
   users            UserEntreprise[]
   employes         Employe[]
   payruns          PayRun[]
+  superAdminAccess SuperAdminAccess[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 }
@@ -46,6 +47,20 @@ model UserEntreprise {
 
   user       User       @relation(fields: [userId], references: [id])
   entreprise Entreprise? @relation(fields: [entrepriseId], references: [id])
+  superAdminAccess SuperAdminAccess[]
+}
+
+model SuperAdminAccess {
+  superAdminId  Int
+  entrepriseId  Int
+  hasAccess     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  superAdmin    UserEntreprise @relation(fields: [superAdminId], references: [id])
+  entreprise    Entreprise     @relation(fields: [entrepriseId], references: [id])
+
+  @@id([superAdminId, entrepriseId])
 }
 
 enum Role {

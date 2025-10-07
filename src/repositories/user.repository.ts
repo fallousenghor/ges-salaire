@@ -2,6 +2,9 @@
 import prisma from '../config/db';
 import { CreateUserDto, UpdateUserDto } from '../type/user.type';
 import UserEntreprise from '../type/userEntreprise';
+import { PaginationParams } from '../type/pagination.types';
+import { paginateResults } from '../utils/pagination.utils';
+import { Prisma } from '@prisma/client';
 
 export class UserRepository {
   async create(data: CreateUserDto) {
@@ -30,12 +33,27 @@ export class UserRepository {
     });
   }
 
-  async findById(id: number) {
-    return prisma.user.findUnique({ where: { id }, include: { roles: true } });
+  async findSuperAdminAccess(params: { where: Prisma.SuperAdminAccessWhereInput }) {
+    return prisma.superAdminAccess.findFirst({
+      where: params.where
+    });
   }
 
-  async findAll() {
-    return prisma.user.findMany({ include: { roles: true } });
+  async findById(id: number) {
+    return prisma.user.findUnique({
+      where: { id },
+      include: { roles: true }
+    });
+  }
+
+  async findAll(pagination?: PaginationParams) {
+    const total = await prisma.user.count();
+    const items = await prisma.user.findMany({
+      include: { roles: true },
+      skip: pagination?.page ? (pagination.page - 1) * (pagination.limit || 10) : undefined,
+      take: pagination?.limit,
+    });
+    return pagination ? paginateResults(items, total, pagination) : items;
   }
 
   async update(id: number, data: UpdateUserDto) {

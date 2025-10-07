@@ -6,4 +6,5 @@ export enum SUCCESS_MESSAGES {
   ACCESS_ENTREPRISE = "Accès à votre espace entreprise",
   BIENVENUE = "Bienvenue !\nVotre mot de passe temporaire est : ",
   CHANGER_PASSWORD_SUCCESS = "\nMerci de le changer à la première connexion.",
+  TOKEN_VALIDE = "Token valide.",
 };
